@@ -12,11 +12,17 @@ if (leadsFromLocalStorage) {
 }
 
 tabBtn.addEventListener("click", function(){    
-    chrome.tabs.query({active: true, currentWindow: true}, function(tabs){
-        myLeads.push(tabs[0].url)
-        localStorage.setItem("myLeads", JSON.stringify(myLeads) )
-        render(myLeads)
-    })
+    // Safety check: Only run extension code if inside an actual Chrome Extension
+    if (typeof chrome !== "undefined" && chrome.tabs) {
+        chrome.tabs.query({active: true, currentWindow: true}, function(tabs){
+            myLeads.push(tabs[0].url)
+            localStorage.setItem("myLeads", JSON.stringify(myLeads) )
+            render(myLeads)
+        })
+    } else {
+        // Fallback alert so your script doesn't crash on Netlify
+        alert("The 'SAVE TAB' feature only works when running as a Chrome Extension!")
+    }
 })
 
 function render(leads) {
